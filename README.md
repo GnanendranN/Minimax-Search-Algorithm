@@ -1,6 +1,6 @@
 <h1>ExpNo 5 : Implement Minimax Search Algorithm for a Simple TIC-TAC-TOE game</h1> 
-<h3>Name:           </h3>
-<h3>Register Number/Staff Id:          </h3>
+<h3>Name: Gnanendran N</h3>
+<h3>Register Number: 212223240037</h3>
 <H3>Aim:</H3>
 <p>
     Implement Minimax Search Algorithm for a Simple TIC-TAC-TOE game
@@ -62,7 +62,8 @@ Let's walk through the algorithm's execution with the full move tree, and show w
 
 Here is the function for scoring the game:
 
-# @player is the turn taking player
+### @player is the turn taking player
+```
 def score(game)
     if game.win?(@player)
         return 10
@@ -72,10 +73,12 @@ def score(game)
         return 0
     end
 end
+```
+
 Simple enough, return +10 if the current player wins the game, -10 if the other player wins and 0 for a draw. You will note that who the player is doesn't matter. X or O is irrelevant, only who's turn it happens to be.
 
 And now the actual minimax algorithm; note that in this implementation a choice or move is simply a row / column address on the board, for example [0,2] is the top right square on a 3x3 board.
-
+```
 def minimax(game)
     return score(game) if game.over?
     scores = [] # an array of scores
@@ -101,7 +104,7 @@ def minimax(game)
         return scores[min_score_index]
     end
 end
-
+```
 <hr>
 <h2>Sample Input and Output</h2>
 
@@ -112,5 +115,9 @@ end
 ![image](https://github.com/natsaravanan/19AI405FUNDAMENTALSOFARTIFICIALINTELLIGENCE/assets/87870499/a2acb6a1-ed8e-42e5-8968-fe805e4b0255)
 
 <hr>
+
+## Output:
+![output](output.png)
+
 <h2>Result:</h2>
 <p>Thus,Implementation of  Minimax Search Algorithm for a Simple TIC-TAC-TOE game wasa done successfully.</p>

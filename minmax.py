@@ -1,74 +1,92 @@
 import time
 
 class Game:
+
     def __init__(self):
         self.initialize_game()
 
+    # Initialize the game
     def initialize_game(self):
-        self.current_state = [['.','.','.'],
-                              ['.','.','.'],
-                              ['.','.','.']]
+        self.current_state = [
+            ['.', '.', '.'],
+            ['.', '.', '.'],
+            ['.', '.', '.']
+        ]
 
-        # Player X always plays first
-        self.player_turn = 'X'
+        
+        self.player_turn = 'X'                                      # Player X always plays first
 
+    # Display the board
     def draw_board(self):
         for i in range(0, 3):
             for j in range(0, 3):
                 print('{}|'.format(self.current_state[i][j]), end=" ")
             print()
         print()
+
+    # Check whether the given position is valid
     def is_valid(self, px, py):
         if px < 0 or px > 2 or py < 0 or py > 2:
             return False
+
         elif self.current_state[px][py] != '.':
             return False
+
         else:
             return True
+
+    # Check whether the game has ended
     def is_end(self):
-    # Vertical win
+
+        # Vertical win
         for i in range(0, 3):
             if (self.current_state[0][i] != '.' and
-                self.current_state[0][i] == self.current_state[1][i] and
-                self.current_state[1][i] == self.current_state[2][i]):
+                    self.current_state[0][i] == self.current_state[1][i] and
+                    self.current_state[1][i] == self.current_state[2][i]):
+
                 return self.current_state[0][i]
 
         # Horizontal win
         for i in range(0, 3):
-            if (self.current_state[i] == ['X', 'X', 'X']):
+
+            if self.current_state[i] == ['X', 'X', 'X']:
                 return 'X'
-            elif (self.current_state[i] == ['O', 'O', 'O']):
+
+            elif self.current_state[i] == ['O', 'O', 'O']:
                 return 'O'
 
-    # Main diagonal win
+        # Main diagonal
         if (self.current_state[0][0] != '.' and
-            self.current_state[0][0] == self.current_state[1][1] and
-            self.current_state[0][0] == self.current_state[2][2]):
+                self.current_state[0][0] == self.current_state[1][1] and
+                self.current_state[0][0] == self.current_state[2][2]):
+
             return self.current_state[0][0]
 
-    # Second diagonal win
+        # Second diagonal
         if (self.current_state[0][2] != '.' and
-            self.current_state[0][2] == self.current_state[1][1] and
-            self.current_state[0][2] == self.current_state[2][0]):
+                self.current_state[0][2] == self.current_state[1][1] and
+                self.current_state[0][2] == self.current_state[2][0]):
+
             return self.current_state[0][2]
 
-    # Is the whole board full?
+        # Check whether the board is full
         for i in range(0, 3):
             for j in range(0, 3):
-            # There's an empty field, we continue the game
-                if (self.current_state[i][j] == '.'):
+
+                if self.current_state[i][j] == '.':
                     return None
 
-    # It's a tie!
+        # Board is full and nobody wins
         return '.'
+
+    # MAX function
+    # O is the maximizing player
     def max(self):
 
-        # Possible values for maxv are:
-        # -1 - loss
-        # 0  - a tie
-        # 1  - win
+        # -1 = X wins
+        #  0 = Tie
+        #  1 = O wins
 
-        # We're initially setting it to -2 as worse than the worst case:
         maxv = -2
 
         px = None
@@ -76,42 +94,48 @@ class Game:
 
         result = self.is_end()
 
-        # If the game came to an end, the function needs to return
-        # the evaluation function of the end. That can be:
-        # -1 - loss
-        # 0  - a tie
-        # 1  - win
+        # If the game has ended
         if result == 'X':
             return (-1, 0, 0)
+
         elif result == 'O':
             return (1, 0, 0)
+
         elif result == '.':
             return (0, 0, 0)
 
+        # Try every possible move
         for i in range(0, 3):
             for j in range(0, 3):
+
+                # Check whether the cell is empty
                 if self.current_state[i][j] == '.':
-                    # On the empty field player 'O' makes a move and calls Min
-                    # That's one branch of the game tree.
+
+                    # O makes a temporary move
                     self.current_state[i][j] = 'O'
+
+                    # Call MIN to simulate X's response
                     (m, min_i, min_j) = self.min()
-                    # Fixing the maxv value if needed
+
+                    # O wants the maximum value
                     if m > maxv:
                         maxv = m
                         px = i
                         py = j
-                    # Setting back the field to empty
+
+                    # Undo the temporary move
                     self.current_state[i][j] = '.'
+
         return (maxv, px, py)
 
+    # MIN function
+    # X is the minimizing player
     def min(self):
 
-        # Possible values for minv are:
-        # -1 - win
-        # 0  - a tie
-        # 1  - loss
+        # -1 = X wins
+        #  0 = Tie
+        #  1 = O wins
 
-        # We're initially setting it to 2 as worse than the worst case:
         minv = 2
 
         qx = None
@@ -119,87 +143,151 @@ class Game:
 
         result = self.is_end()
 
+        # If the game has ended
         if result == 'X':
             return (-1, 0, 0)
+
         elif result == 'O':
             return (1, 0, 0)
+
         elif result == '.':
             return (0, 0, 0)
 
-        '''
-        TYPE THE CODE HERE BY REFERRING TO THE BELOW EXPLANATION.
-        Nested Loops (for i in range(0, 3), for j in range(0, 3)):
+        # Try every possible move
+        for i in range(0, 3):
+            for j in range(0, 3):
 
-These loops iterate over all the cells of the 3x3 Tic-Tac-Toe board (current_state), checking each cell's position (i, j).
-Checking for an Empty Cell (if self.current_state[i][j] == '.'):
+                # Check whether the cell is empty
+                if self.current_state[i][j] == '.':
 
-The condition self.current_state[i][j] == '.' ensures that the AI only considers moves in cells that are currently empty. Empty cells are represented by ..
-Simulating a Move (self.current_state[i][j] = 'O'):
+                    # X makes a temporary move
+                    self.current_state[i][j] = 'X'
 
-If the cell is empty, the AI temporarily places its marker 'O' in that position, simulating a potential move.
-Recursive Minimax Call ((m, min_i, min_j) = self.min()):
+                    # Call MAX to simulate O's response
+                    (m, max_i, max_j) = self.max()
 
-After making the move, the AI calls the min() function. This function simulates the opponent’s (player 'X') move, assuming the opponent will play optimally.
-The function min() will return a value m which represents the best possible outcome for the opponent if the AI makes this move.
-Evaluating the Move (if m > maxv:):
+                    # X wants the minimum value
+                    if m < minv:
+                        minv = m
+                        qx = i
+                        qy = j
 
-The AI wants to maximize its chances of winning, so it compares the result m of the simulated move to the current best score (maxv).
-If the simulated move is better than any previously considered moves, it updates maxv (the best value for player 'O'), and stores the coordinates (px, py) of the current best move.
-Undoing the Simulated Move (self.current_state[i][j] = '.'):
+                    # Undo the temporary move
+                    self.current_state[i][j] = '.'
 
-After evaluating the move, the AI resets the cell back to empty (.), undoing the simulated move. This is necessary to test other possible moves in other cells.
-Returning the Best Move (return (maxv, px, py)):
+        return (minv, qx, qy)
 
-After evaluating all possible moves, the function returns the best possible outcome (maxv) and the coordinates (px, py) of the best move for player 'O'.
-        '''
+    # Main game function
     def play(self):
+
         while True:
+
+            # Display board
             self.draw_board()
+
+            # Check game status
             self.result = self.is_end()
 
-            # Printing the appropriate message if the game has ended
+            # If game has ended
             if self.result != None:
+
                 if self.result == 'X':
                     print('The winner is X!')
+
                 elif self.result == 'O':
                     print('The winner is O!')
+
                 elif self.result == '.':
                     print("It's a tie!")
 
+                # Reset the game
                 self.initialize_game()
                 return
 
-            # If it's player's turn
+            # Human player's turn
             if self.player_turn == 'X':
 
                 while True:
 
+                    # Calculate recommended move using MINIMAX
                     start = time.time()
+
                     (m, qx, qy) = self.min()
+
                     end = time.time()
-                    print('Evaluation time: {}s'.format(round(end - start, 7)))
-                    print('Recommended move: X = {}, Y = {}'.format(qx, qy))
 
-                    px = int(input('Insert the X coordinate: '))
-                    py = int(input('Insert the Y coordinate: '))
+                    print(
+                        'Evaluation time: {}s'.format(
+                            round(end - start, 7)
+                        )
+                    )
 
-                    (qx, qy) = (px, py)
+                    print(
+                        'Recommended move: X = {}, Y = {}'.format(
+                            qx, qy
+                        )
+                    )
 
+                    # Get human player's move
+                    try:
+                        px = int(input('Insert the X coordinate: '))
+                        py = int(input('Insert the Y coordinate: '))
+                    except ValueError:
+                        print('Please enter numbers between 0 and 2.')
+                        continue
+
+                    # Check whether move is valid
                     if self.is_valid(px, py):
+
+                        # Place X
                         self.current_state[px][py] = 'X'
+
+                        # Change turn to O
                         self.player_turn = 'O'
+
                         break
+
                     else:
                         print('The move is not valid! Try again.')
 
-            # If it's AI's turn
+            # AI player's turn
             else:
+
+                print("AI (O) is thinking...")
+
+                start = time.time()
+
+                # MAX chooses the best move for O
                 (m, px, py) = self.max()
+
+                end = time.time()
+
+                print(
+                    'AI evaluation time: {}s'.format(
+                        round(end - start, 7)
+                    )
+                )
+
+                print(
+                    'AI chooses: X = {}, Y = {}'.format(
+                        px, py
+                    )
+                )
+
+                # Place O
                 self.current_state[px][py] = 'O'
+
+                # Change turn to X
                 self.player_turn = 'X'
+
+
+# Main function
 def main():
+
     g = Game()
     g.play()
 
+
+# Start the program
 if __name__ == "__main__":
     main()
